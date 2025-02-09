@@ -47,4 +47,42 @@ function dateBuilder (d) {
   let year = d.getFullYear();
 
   return `${day} ${date} ${month} ${year}`;
+  // Check if SpeechRecognition API is available
+const micButton = document.getElementById("mic-btn");
+const searchBox = document.querySelector(".search-box");
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  // Set recognition settings
+  recognition.continuous = false;  // Stop listening after first result
+  recognition.lang = "en-US";      // Set language to English
+
+  // Start recognition when mic button is clicked
+  micButton.addEventListener("click", () => {
+    recognition.start();
+    micButton.style.backgroundColor = "#ff5555"; // Indicate recording
+  });
+
+  // Capture speech result
+  recognition.onresult = (event) => {
+    const spokenText = event.results[0][0].transcript;
+    searchBox.value = spokenText; // Set input value to spoken text
+    getResults(spokenText); // Fetch weather for the spoken city
+  };
+
+  // Handle errors or when user stops speaking
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error:", event.error);
+    alert("Sorry, could not recognize your voice. Please try again.");
+  };
+
+  recognition.onend = () => {
+    micButton.style.backgroundColor = ""; // Reset button color
+  };
+} else {
+  alert("Speech recognition is not supported in this browser. Try using Google Chrome.");
+}
+
 }
